@@ -526,8 +526,8 @@ const DomainResultCard = ({ data, rawData }: DomainResultCardProps) => {
                 {data.registrar && data.registrar !== 'Unknown' && data.registrar !== 'N/A' && (
                   <div className="info-row">
                     <div className="info-row-label">注册商</div>
-                    <div className="info-row-value flex items-center gap-2 flex-wrap">
-                      <span className="break-all flex-1 min-w-0">{data.registrar}</span>
+                    <div className="info-row-value flex items-center gap-2">
+                      <span className="truncate min-w-0 flex-1">{data.registrar}</span>
                       {registrarUrl && (
                         <Button variant="outline" size="sm" onClick={() => window.open(registrarUrl, '_blank')} className="h-6 px-2 text-xs shrink-0">
                           <ExternalLink className="h-3 w-3 mr-1" />
@@ -543,9 +543,7 @@ const DomainResultCard = ({ data, rawData }: DomainResultCardProps) => {
                     <div className="info-row-value flex items-center gap-2">
                       <span>{formatDate(data.registrationDate)}</span>
                       {registrationTag && (
-                        <Badge variant={registrationTag.variant} className="text-xs">
-                          {registrationTag.text}
-                        </Badge>
+                        <span className="text-xs text-muted-foreground">{registrationTag.text}</span>
                       )}
                     </div>
                   </div>
@@ -556,9 +554,7 @@ const DomainResultCard = ({ data, rawData }: DomainResultCardProps) => {
                     <div className="info-row-value flex items-center gap-2">
                       <span>{formatDate(data.lastUpdated)}</span>
                       {updateTag && (
-                        <Badge variant={updateTag.variant} className="text-xs">
-                          {updateTag.text}
-                        </Badge>
+                        <span className="text-xs text-muted-foreground">{updateTag.text}</span>
                       )}
                     </div>
                   </div>
@@ -569,9 +565,9 @@ const DomainResultCard = ({ data, rawData }: DomainResultCardProps) => {
                     <div className="info-row-value flex items-center gap-2">
                       <span>{formatDate(data.expirationDate)}</span>
                       {expirationTag && (
-                        <Badge variant={expirationTag.variant} className={`text-xs border ${getExpirationBadgeClass()}`}>
+                        <span className="text-xs text-muted-foreground">
                           {expirationTag.text}
-                        </Badge>
+                        </span>
                       )}
                     </div>
                   </div>
@@ -672,9 +668,9 @@ const DomainResultCard = ({ data, rawData }: DomainResultCardProps) => {
                   </Badge>
                 </div>
                 {privacyProtected && (
-                  <div className="mt-3 flex items-center gap-2 select-none pointer-events-none">
-                    <Lock className="h-4 w-4 text-green-600" />
-                    <span className="inline-flex items-center rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-800">
+                  <div className="mt-3 flex items-center gap-2 select-none" style={{ WebkitTapHighlightColor: 'transparent' }}>
+                    <Lock className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    <span className="inline-flex items-center rounded-md bg-green-100 dark:bg-green-900/30 px-2 py-1 text-xs font-medium text-green-800 dark:text-green-300 pointer-events-none">
                       WHOIS隐私保护已启用
                     </span>
                   </div>

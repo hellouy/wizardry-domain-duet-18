@@ -1,6 +1,5 @@
 import React from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
 
 interface PricingData {
   premium: boolean;
@@ -17,7 +16,6 @@ interface PricingInfoProps {
 }
 
 const PricingInfo = ({ pricing, loading, source }: PricingInfoProps) => {
-  const sourceLabel = source === 'rdap' ? 'RDAP' : source === 'whois' ? 'WHOIS' : null;
 
   if (loading) {
     return (
@@ -46,11 +44,6 @@ const PricingInfo = ({ pricing, loading, source }: PricingInfoProps) => {
             <span className="font-medium">{pricing.label}</span>
           </span>
         </div>
-        {sourceLabel && (
-          <Badge variant="outline" className="text-xs shrink-0">
-            {sourceLabel}
-          </Badge>
-        )}
       </div>
     );
   }
@@ -75,11 +68,6 @@ const PricingInfo = ({ pricing, loading, source }: PricingInfoProps) => {
           <span className="font-medium">{pricing.label}</span>
         </span>
       </div>
-      {sourceLabel && (
-        <Badge variant="outline" className="text-xs shrink-0">
-          {sourceLabel}
-        </Badge>
-      )}
     </div>
   );
 };
