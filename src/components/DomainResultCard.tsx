@@ -351,18 +351,7 @@ const DomainResultCard = ({ data, rawData }: DomainResultCardProps) => {
   if (statusStr.includes('client hold') || statusStr.includes('clienthold')) return { text: '注册商暂停解析', variant: 'destructive' };
   if (statusStr.includes('server hold') || statusStr.includes('serverhold')) return { text: '注册局禁止解析', variant: 'destructive' };
 
-  // --- 2. 锁定状态细分 (安全保障判定) ---
-  const isUpdateProhibited = statusStr.includes('update prohibited') || statusStr.includes('updateprohibited');
-  const isTransferProhibited = statusStr.includes('transfer prohibited') || statusStr.includes('transferprohibited');
-  const isDeleteProhibited = statusStr.includes('delete prohibited') || statusStr.includes('deleteprohibited');
-
-  if (isUpdateProhibited && isTransferProhibited && isDeleteProhibited) {
-    return { text: '全功能高密锁定', variant: 'default' };
-  }
-  if (isTransferProhibited) {
-    if (statusStr.includes('server')) return { text: '注册局禁止转移', variant: 'default' };
-    return { text: '禁止转移锁定', variant: 'outline' };
-  }
+  // --- 2. 锁定状态不再显示在更新标签中，统一由域名状态板块展示 ---
 
   // --- 3. 业务动作与生命周期判定 ---
   if (statusStr.includes('pending transfer') || statusStr.includes('pendingtransfer')) return { text: '正在跨商转移', variant: 'destructive' };
@@ -502,8 +491,11 @@ const DomainResultCard = ({ data, rawData }: DomainResultCardProps) => {
     <Card className="border">
       <CardContent className="p-0">
         <Tabs defaultValue="overview" className="w-full">
-          <div className="px-6 py-4 border-b">
-            <h2 className="text-xl font-bold uppercase break-all">{data.domain}</h2>
+          <div className="px-6 py-4 border-b flex items-center justify-between gap-3">
+            <h2 className="text-xl font-bold uppercase break-all min-w-0">{data.domain}</h2>
+            <Badge variant="outline" className="text-xs shrink-0">
+              {data.source === 'primary' ? 'RDAP' : 'WHOIS'}
+            </Badge>
           </div>
 
           <TabsContent value="overview" className="p-6 space-y-6 mt-0">
@@ -543,7 +535,9 @@ const DomainResultCard = ({ data, rawData }: DomainResultCardProps) => {
                     <div className="info-row-value flex items-center gap-2">
                       <span>{formatDate(data.registrationDate)}</span>
                       {registrationTag && (
-                        <span className="text-xs text-muted-foreground">{registrationTag.text}</span>
+                        <Badge variant={registrationTag.variant} className="text-xs">
+                          {registrationTag.text}
+                        </Badge>
                       )}
                     </div>
                   </div>
@@ -554,7 +548,9 @@ const DomainResultCard = ({ data, rawData }: DomainResultCardProps) => {
                     <div className="info-row-value flex items-center gap-2">
                       <span>{formatDate(data.lastUpdated)}</span>
                       {updateTag && (
-                        <span className="text-xs text-muted-foreground">{updateTag.text}</span>
+                        <Badge variant={updateTag.variant} className="text-xs">
+                          {updateTag.text}
+                        </Badge>
                       )}
                     </div>
                   </div>
@@ -565,9 +561,9 @@ const DomainResultCard = ({ data, rawData }: DomainResultCardProps) => {
                     <div className="info-row-value flex items-center gap-2">
                       <span>{formatDate(data.expirationDate)}</span>
                       {expirationTag && (
-                        <span className="text-xs text-muted-foreground">
+                        <Badge variant={expirationTag.variant} className={`text-xs border ${getExpirationBadgeClass()}`}>
                           {expirationTag.text}
-                        </span>
+                        </Badge>
                       )}
                     </div>
                   </div>
