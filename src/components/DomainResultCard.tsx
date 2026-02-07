@@ -38,16 +38,16 @@ const STATUS_MAPPING: Record<string, string> = {
   'clientupdateprohibited': '客户端更新禁止',
   'clienthold': '客户端暂停',
   'clientrenewprohibited': '客户端续费禁止',
-  'server delete prohibited': '服务器删除禁止',
-  'server transfer prohibited': '服务器转移禁止',
-  'server update prohibited': '服务器更新禁止',
-  'server hold': '服务器暂停',
-  'server renew prohibited': '服务器续费禁止',
-  'serverdeleteprohibited': '服务器删除禁止',
-  'servertransferprohibited': '服务器转移禁止',
-  'serverupdateprohibited': '服务器更新禁止',
-  'serverhold': '服务器暂停',
-  'serverrenewprohibited': '服务器续费禁止',
+  'server delete prohibited': '注册局删除禁止',
+  'server transfer prohibited': '注册局转移禁止',
+  'server update prohibited': '注册局更新禁止',
+  'server hold': '注册局暂停解析',
+  'server renew prohibited': '注册局续费禁止',
+  'serverdeleteprohibited': '注册局删除禁止',
+  'servertransferprohibited': '注册局转移禁止',
+  'serverupdateprohibited': '注册局更新禁止',
+  'serverhold': '注册局暂停解析',
+  'serverrenewprohibited': '注册局续费禁止',
   'ok': '正常',
   'active': '激活',
   'actif': '激活',
@@ -347,7 +347,7 @@ const DomainResultCard = ({ data, rawData }: DomainResultCardProps) => {
   if (statusStr.includes('dispute')) return { text: '法律争议中', variant: 'destructive' };
   if (statusStr.includes('quarantine')) return { text: '隔离保护期', variant: 'destructive' };
   
-  // 针对 Hold 状态（不仅是停止解析���往往意味着未实名或政策限制）
+  // 针对 Hold 状态（不仅是停止解������往往意味着未实名或政策限制）
   if (statusStr.includes('client hold') || statusStr.includes('clienthold')) return { text: '注册商暂停解析', variant: 'destructive' };
   if (statusStr.includes('server hold') || statusStr.includes('serverhold')) return { text: '注册局禁止解析', variant: 'destructive' };
 
@@ -372,7 +372,7 @@ const DomainResultCard = ({ data, rawData }: DomainResultCardProps) => {
     return { text: '今日有过变更', variant: 'secondary' };
   }
 
-  // 关键动作预测
+  // 关键动��预测
   if (diffDays <= 7) {
     if (statusStr.includes('ok') || statusStr.includes('active')) return { text: '续费/转移已生效', variant: 'secondary' };
     return { text: '本周资料修正', variant: 'secondary' };
