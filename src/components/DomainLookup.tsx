@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { AlertCircle, Loader2 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import DomainSearch from './DomainSearch';
 import DomainResultCard from './DomainResultCard';
 import PricingInfo from './PricingInfo';
@@ -62,32 +61,38 @@ const DomainLookup = () => {
 
   const performLookup = async (domainName: string) => {
     try {
-      const response = await supabase.functions.invoke('domain-lookup', {
-        body: { domain: domainName }
+      const response = await fetch('/api/domain-lookup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domain: domainName, method: 'rdap' })
       });
 
-      if (response.error) {
-        return { error: '查询服务暂时不可用，请稍后重试' };
-      }
+      const data = await response.json();
 
-      const data = response.data;
-      
-      if (data.error) {
-        let specificError = data.error;
-        if (data.errorType === 'domain_not_found') {
-          specificError = `域名 ${domainName} 未注册，该域名可供注册使用`;
-        } else if (data.errorType === 'domain_reserved') {
-          specificError = `域名 ${domainName} 为保留域名，不可注册`;
-        } else if (data.errorType === 'unsupported_tld') {
-          specificError = data.error;
+      if (!response.ok || data.error) {
+        let errorMsg = '查询服务暂时不可用，请稍后重试';
+        if (data.error?.includes('not found')) {
+          errorMsg = `域名 ${domainName} 未注册，该域名可供注册使用`;
+        } else if (data.error?.includes('not available')) {
+          errorMsg = `WHOIS 服务暂时不可用，请稍后重试`;
         }
-        
-        return { error: specificError, errorType: data.errorType };
+        return { error: errorMsg };
       }
 
-      const mergedData = mergeResults(data);
-      if (mergedData.result) {
-        return { primary: mergedData.result, rawData: mergedData.rawData };
+      if (data.source === 'rdap' || data.source === 'whois') {
+        const result: WhoisData = {
+          domain: domainName,
+          registrar: data.data.registrar || 'N/A',
+          registrationDate: data.data.registrationDate || 'N/A',
+          expirationDate: data.data.expirationDate || 'N/A',
+          lastUpdated: data.data.lastUpdated || 'N/A',
+          nameServers: data.data.nameServers || [],
+          status: data.data.status || [],
+          registrant: data.data.registrant || {},
+          dnssec: data.data.dnssec || false,
+          source: data.source === 'rdap' ? 'primary' : 'secondary'
+        };
+        return { primary: result, rawData: data };
       } else {
         return { error: '未找到域名信息' };
       }

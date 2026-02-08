@@ -38,16 +38,16 @@ const STATUS_MAPPING: Record<string, string> = {
   'clientupdateprohibited': '客户端更新禁止',
   'clienthold': '客户端暂停',
   'clientrenewprohibited': '客户端续费禁止',
-  'server delete prohibited': '服务器删除禁止',
-  'server transfer prohibited': '服务器转移禁止',
-  'server update prohibited': '服务器更新禁止',
-  'server hold': '服务器暂停',
-  'server renew prohibited': '服务器续费禁止',
-  'serverdeleteprohibited': '服务器删除禁止',
-  'servertransferprohibited': '服务器转移禁止',
-  'serverupdateprohibited': '服务器更新禁止',
-  'serverhold': '服务器暂停',
-  'serverrenewprohibited': '服务器续费禁止',
+  'server delete prohibited': '注册局删除禁止',
+  'server transfer prohibited': '注册局转移禁止',
+  'server update prohibited': '注册局更新禁止',
+  'server hold': '注册局暂停解析',
+  'server renew prohibited': '注册局续费禁止',
+  'serverdeleteprohibited': '注册局删除禁止',
+  'servertransferprohibited': '注册局转移禁止',
+  'serverupdateprohibited': '注册局更新禁止',
+  'serverhold': '注册局暂停解析',
+  'serverrenewprohibited': '注册局续费禁止',
   'ok': '正常',
   'active': '激活',
   'actif': '激活',
@@ -347,22 +347,11 @@ const DomainResultCard = ({ data, rawData }: DomainResultCardProps) => {
   if (statusStr.includes('dispute')) return { text: '法律争议中', variant: 'destructive' };
   if (statusStr.includes('quarantine')) return { text: '隔离保护期', variant: 'destructive' };
   
-  // 针对 Hold 状态（不仅是停止解析���往往意味着未实名或政策限制）
+  // 针对 Hold 状态（不仅是停止解������往往意味着未实名或政策限制）
   if (statusStr.includes('client hold') || statusStr.includes('clienthold')) return { text: '注册商暂停解析', variant: 'destructive' };
   if (statusStr.includes('server hold') || statusStr.includes('serverhold')) return { text: '注册局禁止解析', variant: 'destructive' };
 
-  // --- 2. 锁定状态细分 (安全保障判定) ---
-  const isUpdateProhibited = statusStr.includes('update prohibited') || statusStr.includes('updateprohibited');
-  const isTransferProhibited = statusStr.includes('transfer prohibited') || statusStr.includes('transferprohibited');
-  const isDeleteProhibited = statusStr.includes('delete prohibited') || statusStr.includes('deleteprohibited');
-
-  if (isUpdateProhibited && isTransferProhibited && isDeleteProhibited) {
-    return { text: '全功能高密锁定', variant: 'default' };
-  }
-  if (isTransferProhibited) {
-    if (statusStr.includes('server')) return { text: '注册局禁止转移', variant: 'default' };
-    return { text: '禁止转移锁定', variant: 'outline' };
-  }
+  // --- 2. 锁定状态不再显示在更新标签中，统一由域名状态板块展示 ---
 
   // --- 3. 业务动作与生命周期判定 ---
   if (statusStr.includes('pending transfer') || statusStr.includes('pendingtransfer')) return { text: '正在跨商转移', variant: 'destructive' };
@@ -383,7 +372,7 @@ const DomainResultCard = ({ data, rawData }: DomainResultCardProps) => {
     return { text: '今日有过变更', variant: 'secondary' };
   }
 
-  // 关键动作预测
+  // 关键动��预测
   if (diffDays <= 7) {
     if (statusStr.includes('ok') || statusStr.includes('active')) return { text: '续费/转移已生效', variant: 'secondary' };
     return { text: '本周资料修正', variant: 'secondary' };
@@ -502,8 +491,11 @@ const DomainResultCard = ({ data, rawData }: DomainResultCardProps) => {
     <Card className="border">
       <CardContent className="p-0">
         <Tabs defaultValue="overview" className="w-full">
-          <div className="px-6 py-4 border-b">
-            <h2 className="text-xl font-bold uppercase break-all">{data.domain}</h2>
+          <div className="px-6 py-4 border-b flex items-center justify-between gap-3">
+            <h2 className="text-xl font-bold uppercase break-all min-w-0">{data.domain}</h2>
+            <Badge variant="outline" className="text-xs shrink-0">
+              {data.source === 'primary' ? 'RDAP' : 'WHOIS'}
+            </Badge>
           </div>
 
           <TabsContent value="overview" className="p-6 space-y-6 mt-0">
@@ -526,8 +518,8 @@ const DomainResultCard = ({ data, rawData }: DomainResultCardProps) => {
                 {data.registrar && data.registrar !== 'Unknown' && data.registrar !== 'N/A' && (
                   <div className="info-row">
                     <div className="info-row-label">注册商</div>
-                    <div className="info-row-value flex items-center gap-2 flex-wrap">
-                      <span className="break-all flex-1 min-w-0">{data.registrar}</span>
+                    <div className="info-row-value flex items-center gap-2">
+                      <span className="truncate min-w-0 flex-1">{data.registrar}</span>
                       {registrarUrl && (
                         <Button variant="outline" size="sm" onClick={() => window.open(registrarUrl, '_blank')} className="h-6 px-2 text-xs shrink-0">
                           <ExternalLink className="h-3 w-3 mr-1" />
@@ -672,9 +664,9 @@ const DomainResultCard = ({ data, rawData }: DomainResultCardProps) => {
                   </Badge>
                 </div>
                 {privacyProtected && (
-                  <div className="mt-3 flex items-center gap-2 select-none pointer-events-none">
-                    <Lock className="h-4 w-4 text-green-600" />
-                    <span className="inline-flex items-center rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-800">
+                  <div className="mt-3 flex items-center gap-2 select-none" style={{ WebkitTapHighlightColor: 'transparent' }}>
+                    <Lock className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    <span className="inline-flex items-center rounded-md bg-green-100 dark:bg-green-900/30 px-2 py-1 text-xs font-medium text-green-800 dark:text-green-300 pointer-events-none">
                       WHOIS隐私保护已启用
                     </span>
                   </div>
